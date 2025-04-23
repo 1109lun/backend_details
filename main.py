@@ -3,7 +3,7 @@ from schemas import UserOut
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 import hashlib
-from schemas import UserCreate
+from schemas import UserCreate , UserUpdate
 from sqlalchemy.exc import IntegrityError
 from database import SessionLocal
 import models
@@ -88,3 +88,31 @@ def delete_user(
     db.delete(user)
     db.commit()
     return {"message": f"使用者 {username} 已刪除"}
+
+print(UserUpdate.model_json_schema())
+
+@app.patch("/user/")
+def update_user(
+    update_data: UserUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    user = db.query(models.User).filter(models.User.username == current_user.username).first()
+    if not user:
+        raise HTTPException(status_code=400, detail="使用者不存在")
+
+    updated = False
+
+    if update_data.password:
+        user.password = hashlib.sha256(update_data.password.encode()).hexdigest()
+        updated = True
+
+    if update_data.birthday:
+        user.birthday = update_data.birthday
+        updated = True
+
+    if not updated:
+        raise HTTPException(status_code=400, detail="未提供任何更新欄位")
+
+    db.commit()
+    return {"message": "使用者資料已更新"}

@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel , Field
 from datetime import date, datetime
 from typing import Optional
 
@@ -17,5 +17,5 @@ class UserOut(BaseModel):
         orm_mode = True
 
 class UserUpdate(BaseModel):
-    password: Optional[str]
-    birthday: Optional[date]
+    password: Optional[str] = Field(default=None)
+    birthday: Optional[date] = Field(default=None)
