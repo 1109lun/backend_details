@@ -4,19 +4,15 @@ from models import User, Base
 from datetime import datetime
 import hashlib
 
-# 資料庫連線字串，請根據你的設定調整
 DATABASE_URL = "postgresql://todo-user:todopassword@localhost:5433/test"
 
-# 建立連線
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine)
 session = SessionLocal()
 
-# SHA256 密碼加密
 def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
 
-# 建立使用者資料
 users = [
     User(
         username="aaa",
@@ -35,6 +31,5 @@ users = [
     )
 ]
 
-# 寫入資料庫
 session.add_all(users)
 session.commit()

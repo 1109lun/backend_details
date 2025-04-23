@@ -13,18 +13,17 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 
 origins = [
-    "http://localhost:5173",  # React 開發伺服器的網址
+    "http://localhost:5173",  # React 伺服器的網址
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # ✅ 允許這些來源
+    allow_origins=origins,  
     allow_credentials=True,
-    allow_methods=["*"],    # ✅ 允許所有方法（GET/POST/DELETE...）
-    allow_headers=["*"],    # ✅ 允許所有 headers（像 Authorization）
+    allow_methods=["*"],    
+    allow_headers=["*"],   
 )
 
-# 用於 Dependency Injection 的 DB session
 def get_db():
     db = SessionLocal()
     try:
@@ -38,35 +37,28 @@ def login(
     password: str = Form(...),
     db: Session = Depends(get_db)
 ):
-    # 找出該使用者
     user = db.query(models.User).filter(models.User.username == username).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="帳號或密碼錯誤")
 
-    # 驗證密碼（SHA256）
     hashed_input_password = hashlib.sha256(password.encode()).hexdigest()
     if user.password != hashed_input_password:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="帳號或密碼錯誤")
-
-    # 更新 last_login
+    
     user.last_login = datetime.utcnow()
     db.commit()
 
-    # 發 token
     access_token = create_access_token(data={"sub": user.username})
     return {"access_token": access_token, "token_type": "bearer"}
 
 @app.post("/user/")
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
-    # 檢查是否已存在
     existing_user = db.query(models.User).filter(models.User.username == user.username).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="使用者已存在")
 
-    # 加密密碼
     hashed_password = hashlib.sha256(user.password.encode()).hexdigest()
 
-    # 新增使用者
     new_user = models.User(
         username=user.username,
         password=hashed_password,
