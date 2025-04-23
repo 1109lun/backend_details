@@ -8,8 +8,21 @@ from sqlalchemy.exc import IntegrityError
 from database import SessionLocal
 import models
 from auth import create_access_token, get_current_user
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+origins = [
+    "http://localhost:5173",  # React 開發伺服器的網址
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # ✅ 允許這些來源
+    allow_credentials=True,
+    allow_methods=["*"],    # ✅ 允許所有方法（GET/POST/DELETE...）
+    allow_headers=["*"],    # ✅ 允許所有 headers（像 Authorization）
+)
 
 # 用於 Dependency Injection 的 DB session
 def get_db():
