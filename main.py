@@ -1,4 +1,5 @@
-from fastapi import FastAPI, Depends, HTTPException, status, Form , Body
+from fastapi import FastAPI, Depends, HTTPException, status, Form , Query
+from schemas import UserOut
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 import hashlib
@@ -67,3 +68,9 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 
     return {"message": "使用者建立成功"}
 
+@app.get("/user/", response_model=UserOut)
+def get_user(username: str = Query(...), db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    user = db.query(models.User).filter(models.User.username == username).first()
+    if not user:
+        raise HTTPException(status_code=400, detail="使用者不存在")
+    return user
