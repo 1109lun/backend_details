@@ -12,10 +12,15 @@ dependencies = [
     "sqlalchemy (>=2.0.40,<3.0.0)",
     "alembic (>=1.15.2,<2.0.0)",
     "psycopg2-binary (>=2.9.10,<3.0.0)",
-    "python-jose (>=3.4.0,<4.0.0)"
+    "python-jose (>=3.4.0,<4.0.0)",
+    "python-multipart (>=0.0.20,<0.0.21)"
 ]
 
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
+uvicorn = "^0.34.2"
+
