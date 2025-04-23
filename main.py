@@ -74,3 +74,17 @@ def get_user(username: str = Query(...), db: Session = Depends(get_db), current_
     if not user:
         raise HTTPException(status_code=400, detail="使用者不存在")
     return user
+
+@app.delete("/user/")
+def delete_user(
+    username: str = Form(...),
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    user = db.query(models.User).filter(models.User.username == username).first()
+    if not user:
+        raise HTTPException(status_code=400, detail="使用者不存在")
+
+    db.delete(user)
+    db.commit()
+    return {"message": f"使用者 {username} 已刪除"}
