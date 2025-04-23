@@ -1,1 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Poetry 虛擬環境（本地）
 .venv/
+
+# VS Code 設定（如果有）
+.vscode/
+
+# Alembic 自動產生的暫存
+alembic/versions/__pycache__/
+
+# DB/Secret 設定（如.env）
+.env
+
+# MacOS
+.DS_Store
+
+# Log 或其他暫存檔
+*.log
